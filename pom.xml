@@ -281,6 +281,7 @@
                     <encoding>UTF-8</encoding>
                     <!--用于额外导入jar包-->
                     <compilerArguments>
+                        <!--本地jar包发布到服务器上-->
                         <extdirs>${project.basedir}/src/main/webapp/WEB-INF/lib</extdirs>
                     </compilerArguments>
                 </configuration>
