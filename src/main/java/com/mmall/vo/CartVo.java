@@ -9,6 +9,7 @@ public class CartVo {
     private List<CartProductVo> cartProductVoList;
     private BigDecimal cartTotalPrice;
     private Boolean allChecked; //是否已经都勾选
+
     private String imageHost;
 
     public BigDecimal getCartTotalPrice() {
