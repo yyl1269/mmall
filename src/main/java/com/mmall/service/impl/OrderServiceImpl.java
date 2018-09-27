@@ -16,11 +16,13 @@ import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.OrderItemMapper;
 import com.mmall.dao.OrderMapper;
+import com.mmall.dao.PayInfoMapper;
 import com.mmall.pojo.Order;
 import com.mmall.pojo.OrderItem;
 import com.mmall.pojo.PayInfo;
 import com.mmall.service.IOrderService;
 import com.mmall.util.BigDecimalUtil;
+import com.mmall.util.DateTimeUtil;
 import com.mmall.util.FTPUtil;
 import com.mmall.util.PropertiesUtil;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,9 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private OrderItemMapper orderItemMapper;
+
+    @Autowired
+    private PayInfoMapper payInfoMapper;
 
     public ServerResponse pay(Long orderNo,Integer userId,String path){
         Map<String,String> resultMap = Maps.newHashMap();
@@ -202,8 +207,12 @@ public class OrderServiceImpl implements IOrderService {
         if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode()){
             return ServerResponse.createBySuccess("支付宝重复调用");
         }
+        //交易成功
         if (Const.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS.equals(tradeStatus)){
+            //更新时间
+            order.setPaymentTime(DateTimeUtil.strToDate(params.get("gmt_payment")));
             order.setStatus(Const.OrderStatusEnum.PAID.getCode());
+            //更新
             orderMapper.updateByPrimaryKeySelective(order);
         }
 
@@ -211,6 +220,24 @@ public class OrderServiceImpl implements IOrderService {
         payInfo.setUserId(order.getUserId());
         payInfo.setOrderNo(order.getOrderNo());
 
-        //todo 不知所云... mac边学习边代码实在难受,mac还是较为适合外出开发
+        payInfo.setPayPlatform(Const.PayPlatformEnum.ALIPAY.getCode());
+        payInfo.setPlatformNumber(tradeNo);
+        payInfo.setPlatformStatus(tradeStatus);
+
+        payInfoMapper.insert(payInfo);
+
+        return ServerResponse.createBySuccess();
+
+    }
+
+    public ServerResponse queryOrderPayStatus(Integer userId,Long orderNo){
+        Order order = orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
+        if (order == null){
+            return ServerResponse.createByErrorMessage("用户没有该订单");
+        }
+        if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode()){
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
     }
 }
