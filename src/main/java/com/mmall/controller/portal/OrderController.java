@@ -29,8 +29,21 @@ public class OrderController {
 
     @Autowired
     private IOrderService iOrderService;
-
     private final static Logger logger = LoggerFactory.getLogger(OrderController.class);
+
+
+    @RequestMapping("create.do")
+    @ResponseBody
+    public ServerResponse create(HttpSession session, Integer shippingId){
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        return iOrderService.pay(orderNo,user.getId(),path);
+    }
+
+
 
     /**
      * 支付宝的支付方法
@@ -74,7 +87,7 @@ public class OrderController {
         try {
             boolean alipayRSACheckedV2 = AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(), "utf-8", Configs.getSignType());
             if (!alipayRSACheckedV2){
-                return ServerResponse.createByErrorMessage("非法请求,验证不通过,再恶意请求就报警!")
+                return ServerResponse.createByErrorMessage("非法请求,验证不通过,再恶意请求就报警!");
             }
         } catch (AlipayApiException e) {
             logger.error("支付宝回调异常",e);
