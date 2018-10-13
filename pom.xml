@@ -276,8 +276,8 @@
                 <version>2.3.2</version>
                 <configuration>
                     <!--和jdk对齐-->
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                     <!--用于额外导入jar包-->
                     <compilerArguments>
