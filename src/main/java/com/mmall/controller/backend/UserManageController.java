@@ -86,17 +86,21 @@ public class UserManageController {
         String str_send = "Hello 我是服务端";
         byte[] buf = new byte[1024];
         //服务端在3000端口监听接收到的数据
-        DatagramSocket ds = new DatagramSocket(3000);
+        DatagramSocket ds = null;
+        try {
+            ds = new DatagramSocket(3000);
+        } catch (SocketException e) {
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("未成功！");
+        }
         //接收从客户端发送过来的数据
         DatagramPacket dp_receive = new DatagramPacket(buf, 1024);
-        System.out.println("server is on，waiting for client to send data......");
         String data = "";
         boolean f = true;
 
         while(f){
             //服务器端接收来自客户端的数据
             ds.receive(dp_receive);
-            System.out.println("server received data from client：");
             String str_receive = new String(dp_receive.getData(),0,dp_receive.getLength()) +
                     " from " + dp_receive.getAddress().getHostAddress() + ":" + dp_receive.getPort();
 
