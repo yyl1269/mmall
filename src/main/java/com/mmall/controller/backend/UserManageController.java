@@ -86,7 +86,7 @@ public class UserManageController {
         String str_send = "Hello 我是服务端";
         byte[] buf = new byte[1024];
         //服务端在3000端口监听接收到的数据
-        DatagramSocket ds = new DatagramSocket(8888);
+        DatagramSocket ds = new DatagramSocket(6900);
 
         //接收从客户端发送过来的数据
         DatagramPacket dp_receive = new DatagramPacket(buf, 1024);
@@ -101,12 +101,14 @@ public class UserManageController {
 
             data = str_receive;
             System.out.println(str_receive);
-            //数据发动到客户端的3000端口
+            //数据发动到客户端的9000端口
             DatagramPacket dp_send= new DatagramPacket(str_send.getBytes(),str_send.length(),dp_receive.getAddress(),9000);
             ds.send(dp_send);
             //由于dp_receive在接收了数据之后，其内部消息长度值会变为实际接收的消息的字节数，
             //所以这里要将dp_receive的内部消息长度重新置为1024
             dp_receive.setLength(1024);
+
+
         }
         ds.close();
         return ServerResponse.createBySuccessMessage("成功，回应信息是："+data);
