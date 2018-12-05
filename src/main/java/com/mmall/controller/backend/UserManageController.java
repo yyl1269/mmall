@@ -69,9 +69,9 @@ public class UserManageController {
     }
 
 
-    @RequestMapping(value="TestServer.do",method = RequestMethod.POST)
+    @RequestMapping(value="TestServer.do")
     @ResponseBody
-    public ServerResponse TestServer(@RequestBody Map<String,String> map, HttpSession session) throws IOException {
+    public ServerResponse TestServer() throws IOException {
 
         String str_send = "Hello 我是服务端";
         byte[] buf = new byte[1024];
