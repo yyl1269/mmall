@@ -26,11 +26,6 @@ public class UserManageController {
     @RequestMapping(value="login.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<User> login(@RequestParam(value = "username") String username,@RequestParam(value = "password") String password, HttpSession session){
-        System.out.println("！！！！！！！！要显著！！！！！！！！！！！！！！！！！！！！！！！！！！");
-        System.out.println("！！！！！！！！要显著！！！！！！！！！！！！！！！！！！！！！！！！！！");
-        System.out.println("！！！！！！！！要显著！！！！！！！！！！！！！！！！！！！！！！！！！！");
-        System.out.println(username);
-        System.out.println(password);
         ServerResponse<User> response = iUserService.login(username,password);
         if(response.isSuccess()){
             User user = response.getData();
