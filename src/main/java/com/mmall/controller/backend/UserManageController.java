@@ -10,8 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.Map;
 
 @Controller
@@ -81,47 +83,39 @@ public class UserManageController {
     @ResponseBody
     public ServerResponse TestServer() throws IOException {
 
+        String str_send = "Hello 我是服务端";
+        byte[] buf = new byte[1024];
+        //服务端在3000端口监听接收到的数据
+        DatagramSocket ds = null;
         try {
-            ServerSocket serverSocket=new ServerSocket(3000);
-            System.out.println("服务端已启动，等待客户端连接..");
-            Socket socket=serverSocket.accept();//侦听并接受到此套接字的连接,返回一个Socket对象
-
-
-            //根据输入输出流和客户端连接
-            InputStream inputStream=socket.getInputStream();//得到一个输入流，接收客户端传递的信息
-            InputStreamReader inputStreamReader=new InputStreamReader(inputStream);//提高效率，将自己字节流转为字符流
-            BufferedReader bufferedReader=new BufferedReader(inputStreamReader);//加入缓冲区
-            String temp=null;
-            String info="";
-            while((temp=bufferedReader.readLine())!=null){
-                info+=temp;
-                System.out.println("已接收到客户端连接");
-                System.out.println("服务端接收到客户端信息："+info+",当前客户端ip为："+socket.getInetAddress().getHostAddress());
-            }
-
-            OutputStream outputStream=socket.getOutputStream();//获取一个输出流，向服务端发送信息
-            PrintWriter printWriter=new PrintWriter(outputStream);//将输出流包装成打印流
-            printWriter.print("你好，服务端已接收到您的信息");
-            printWriter.flush();
-            socket.shutdownOutput();//关闭输出流
-
-
-
-            //关闭相对应的资源
-            printWriter.close();
-            outputStream.close();
-            bufferedReader.close();
-            inputStream.close();
-            socket.close();
-
-            return ServerResponse.createBySuccessMessage("成功，回应信息是："+info);
-
-
-        } catch (IOException e) {
+            ds = new DatagramSocket(8888);
+        } catch (SocketException e) {
             e.printStackTrace();
-            return ServerResponse.createByErrorMessage("失败");
-
+            return ServerResponse.createByErrorMessage("未成功！");
         }
+        //接收从客户端发送过来的数据
+        DatagramPacket dp_receive = new DatagramPacket(buf, 1024);
+        String data = "";
+        boolean f = true;
+
+        while(f){
+            //服务器端接收来自客户端的数据
+            ds.receive(dp_receive);
+            String str_receive = new String(dp_receive.getData(),0,dp_receive.getLength()) +
+                    " from " + dp_receive.getAddress().getHostAddress() + ":" + dp_receive.getPort();
+
+            data = str_receive;
+            System.out.println(str_receive);
+            //数据发动到客户端的3000端口
+            DatagramPacket dp_send= new DatagramPacket(str_send.getBytes(),str_send.length(),dp_receive.getAddress(),9000);
+            ds.send(dp_send);
+            //由于dp_receive在接收了数据之后，其内部消息长度值会变为实际接收的消息的字节数，
+            //所以这里要将dp_receive的内部消息长度重新置为1024
+            dp_receive.setLength(1024);
+        }
+        ds.close();
+
+        return ServerResponse.createBySuccessMessage("成功，回应信息是："+data);
     }
 
 }
