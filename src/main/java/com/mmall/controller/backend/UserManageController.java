@@ -88,7 +88,7 @@ public class UserManageController {
         //服务端在3000端口监听接收到的数据
         DatagramSocket ds = null;
         try {
-            ds = new DatagramSocket(3000);
+            ds = new DatagramSocket(8888);
         } catch (SocketException e) {
             e.printStackTrace();
             return ServerResponse.createByErrorMessage("未成功！");
