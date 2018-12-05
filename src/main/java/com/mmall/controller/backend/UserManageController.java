@@ -82,7 +82,7 @@ public class UserManageController {
     public ServerResponse TestServer() throws IOException {
 
         try {
-            ServerSocket serverSocket=new ServerSocket(8888);
+            ServerSocket serverSocket=new ServerSocket(3000);
             System.out.println("服务端已启动，等待客户端连接..");
             Socket socket=serverSocket.accept();//侦听并接受到此套接字的连接,返回一个Socket对象
 
