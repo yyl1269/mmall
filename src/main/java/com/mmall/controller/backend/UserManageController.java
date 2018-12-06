@@ -89,7 +89,7 @@ public class UserManageController {
         String str_send = "Hello UDPserver";
         byte[] buf = new byte[1024];
         //客户端在9000端口监听接收到的数据
-        DatagramSocket ds = new DatagramSocket(9000);
+        DatagramSocket ds = new DatagramSocket();
         //InetAddress loc = InetAddress.getLocalHost();
 
         InetAddress loc = InetAddress.getByName("118.31.62.7");
